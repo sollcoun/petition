@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Петиция: баллы для «Полный квиздец»</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--text:#1c1c1a;--muted:#6b6a65;--line:#e2e0d8;--accent:#d6362f;--accent-text:#fff;--soft:#f1efe8;--err:#b3261e;--chip-on:#fbe9e7}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--card:#212120;--text:#f1efe8;--muted:#a3a198;--line:#34332f;--accent:#e5534b;--accent-text:#fff;--soft:#2b2a28;--err:#ff8a80;--chip-on:#3a2523}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.tag{font-size:13px;color:var(--muted);margin:0 0 4px}
+h1{font-size:24px;line-height:1.25;margin:0 0 10px;font-weight:600}
+p{margin:0 0 12px}
+.muted{color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 10px}
+.stat{background:var(--soft);border-radius:10px;padding:10px 12px}
+.stat span{display:block;font-size:12px;color:var(--muted)}
+.stat b{font-size:24px;font-weight:600}
+.bar{height:8px;border-radius:4px;background:var(--soft);overflow:hidden}
+.bar>div{height:100%;width:0;background:var(--accent);transition:width .4s}
+label.f{display:block;font-size:14px;margin:16px 0 6px;color:var(--muted)}
+input[type=text]{width:100%;height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px;background:var(--card);color:var(--text)}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.chip{height:44px;margin:0;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font-size:16px;font-weight:500;cursor:pointer;width:auto}
+.chip:hover{background:var(--soft)}
+.chip.on{background:var(--chip-on);border-color:var(--accent);color:var(--accent)}
+.drop{display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed var(--line);border-radius:10px;padding:14px;font-size:14px;color:var(--muted);cursor:pointer;text-align:center}
+.drop:hover{background:var(--soft)}
+#pv{display:none;width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-top:10px}
+.err{color:var(--err);font-size:14px;min-height:20px;margin:8px 0 0}
+#send{width:100%;height:46px;margin-top:6px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-text);font-size:16px;font-weight:600;cursor:pointer}
+#send:disabled{opacity:.6;cursor:default}
+.ok{display:none;background:var(--soft);border-radius:10px;padding:12px;margin-top:12px;font-size:15px}
+.row{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.th{width:48px;height:48px;border-radius:10px;object-fit:cover;background:var(--soft);flex:none}
+.name{font-size:15px;word-break:break-word}
+.time{font-size:12px;color:var(--muted)}
+.pts{margin-left:auto;font-weight:600;color:var(--accent);white-space:nowrap;padding-left:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <p class="tag">Электронная петиция</p>
+    <h1>Подарить баллы команде «Полный квиздец»</h1>
+    <p class="muted">Мы честно старались. Ответов мало, зато энтузиазма на троих. Просим жюри проявить великодушие и добавить баллы.</p>
+
+    <div class="stats">
+      <div class="stat"><span>Подписали</span><b id="cnt">0</b></div>
+      <div class="stat"><span>Подарено баллов</span><b id="sum">0</b></div>
+    </div>
+    <div class="bar"><div id="fill"></div></div>
+    <p class="muted" style="margin:6px 0 0">Цель: <span id="goal">50</span> подписей</p>
+
+    <label class="f" for="team">Название вашей команды</label>
+    <input id="team" type="text" maxlength="60" placeholder="Например, Мозговой штурм" autocomplete="off">
+
+    <label class="f">Сколько баллов дарите? <b id="sel" style="color:var(--text)"></b></label>
+    <div class="chips" id="chips"></div>
+
+    <label class="f">Фото команды (по желанию)</label>
+    <label class="drop" for="photo"><span id="pt">Прикрепить фото</span></label>
+    <input id="photo" type="file" accept="image/*" hidden>
+    <img id="pv" alt="Превью фото">
+
+    <p class="err" id="err" role="alert"></p>
+    <button id="send" type="button">Подписать от команды</button>
+    <div class="ok" id="ok">Подпись принята. Спасибо!</div>
+  </div>
+
+  <div class="card">
+    <p class="tag">Подписались</p>
+    <div id="list"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const MAX_SIZE = 5 * 1024 * 1024;
+let pvUrl = null;
+let chosen = 0;
+let maxPoints = 0;
+
+function fmt(s) {
+  const d = new Date(s.replace(' ', 'T') + 'Z');
+  return d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function buildChips(max) {
+  if (max === maxPoints) return;
+  maxPoints = max;
+  const box = $('chips');
+  box.textContent = '';
+  for (let i = 1; i <= max; i++) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.textContent = i;
+    b.addEventListener('click', () => {
+      chosen = i;
+      $('err').textContent = '';
+      $('sel').textContent = i;
+      Array.prototype.forEach.call(box.children, c => c.classList.toggle('on', Number(c.textContent) === i));
+    });
+    box.appendChild(b);
+  }
+}
+
+function resetChips() {
+  chosen = 0;
+  $('sel').textContent = '';
+  Array.prototype.forEach.call($('chips').children, c => c.classList.remove('on'));
+}
+
+async function load() {
+  const r = await fetch('/api/signatures');
+  const data = await r.json();
+  buildChips(data.maxPoints);
+  $('cnt').textContent = data.count;
+  $('sum').textContent = data.totalPoints;
+  const goal = Math.max(data.goal, data.count, 1);
+  $('goal').textContent = goal;
+  $('fill').style.width = Math.min(100, Math.round(data.count / goal * 100)) + '%';
+  const list = $('list');
+  list.textContent = '';
+  if (!data.items.length) {
+    const p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = 'Станьте первой командой.';
+    list.appendChild(p);
+    return;
+  }
+  data.items.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    if (it.photo) {
+      const img = document.createElement('img');
+      img.className = 'th';
+      img.src = it.photo;
+      img.alt = '';
+      img.loading = 'lazy';
+      row.appendChild(img);
+    } else {
+      const ph = document.createElement('div');
+      ph.className = 'th';
+      row.appendChild(ph);
+    }
+    const box = document.createElement('div');
+    const n = document.createElement('div');
+    n.className = 'name';
+    n.textContent = it.team;
+    const t = document.createElement('div');
+    t.className = 'time';
+    t.textContent = fmt(it.createdAt);
+    box.appendChild(n);
+    box.appendChild(t);
+    row.appendChild(box);
+    const pts = document.createElement('div');
+    pts.className = 'pts';
+    pts.textContent = it.points > 0 ? '+' + it.points : '';
+    row.appendChild(pts);
+    list.appendChild(row);
+  });
+}
+
+$('team').addEventListener('input', () => { $('err').textContent = ''; });
+
+$('photo').addEventListener('change', () => {
+  const f = $('photo').files[0];
+  $('err').textContent = '';
+  if (pvUrl) { URL.revokeObjectURL(pvUrl); pvUrl = null; }
+  if (!f) { $('pv').style.display = 'none'; $('pt').textContent = 'Прикрепить фото'; return; }
+  if (f.size > MAX_SIZE) {
+    $('photo').value = '';
+    $('pv').style.display = 'none';
+    $('pt').textContent = 'Прикрепить фото';
+    $('err').textContent = 'Фото больше 5 МБ';
+    return;
+  }
+  pvUrl = URL.createObjectURL(f);
+  $('pv').src = pvUrl;
+  $('pv').style.display = 'block';
+  $('pt').textContent = f.name;
+});
+
+$('send').addEventListener('click', async () => {
+  const team = $('team').value.trim();
+  if (!team) { $('err').textContent = 'Введите название команды'; return; }
+  if (!chosen) { $('err').textContent = 'Выберите количество баллов'; return; }
+  const fd = new FormData();
+  fd.append('team', team);
+  fd.append('points', String(chosen));
+  const f = $('photo').files[0];
+  if (f) fd.append('photo', f);
+  $('send').disabled = true;
+  try {
+    const r = await fetch('/api/sign', { method: 'POST', body: fd });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) { $('err').textContent = data.error || 'Не удалось отправить'; return; }
+    $('team').value = '';
+    $('photo').value = '';
+    $('pv').style.display = 'none';
+    $('pt').textContent = 'Прикрепить фото';
+    resetChips();
+    $('ok').style.display = 'block';
+    await load();
+  } catch (e) {
+    $('err').textContent = 'Нет связи с сервером';
+  } finally {
+    $('send').disabled = false;
+  }
+});
+
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>
