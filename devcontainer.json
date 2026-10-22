@@ -1,0 +1,12 @@
+{
+  "name": "quiz-petition",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Петиция",
+      "onAutoForward": "notify"
+    }
+  }
+}
